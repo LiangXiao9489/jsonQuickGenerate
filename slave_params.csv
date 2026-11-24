@@ -1,0 +1,5 @@
+name,tag,type,range,default
+占位参数 AAA,aaa,number,0~10,0
+占位参数 BBB,bbb,number,100~1000,100
+占位参数 CCC,ccc,string,ON / OFF,OFF
+占位参数 DDD,ddd,number,1~255,1

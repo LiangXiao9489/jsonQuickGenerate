@@ -14,7 +14,7 @@ python app.py
 
 ## 修改参数
 
-直接编辑 `gateway_params.csv`。它可以用 Excel 打开、编辑和保存。字段含义如下：
+直接编辑 `gateway_params.csv`（网关参数）或 `slave_params.csv`（设备点位参数）。它们都可以用 Excel 打开、编辑和保存。字段含义如下：
 
 - `name`：下拉列表显示名称
 - `tag`：协议中真正发送的字段名
