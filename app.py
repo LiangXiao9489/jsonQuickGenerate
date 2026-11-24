@@ -26,6 +26,13 @@ def value_hint(row):
     return f"类型: {kind}    合法范围提示: {scope or '无'}"
 
 
+def update_topic_info(widget, text):
+    widget.configure(state="normal")
+    widget.delete("1.0", "end")
+    widget.insert("1.0", text)
+    widget.configure(state="disabled")
+
+
 class WriteGatewayDialog(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -66,6 +73,10 @@ class WriteGatewayDialog(tk.Toplevel):
         ttk.Label(bottom, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(bottom, height=8, wrap="none")
         self.output.pack(fill="both", expand=True, pady=(4, 8))
+        self.topic_info = tk.Text(bottom, height=2, width=55, wrap="none", relief="flat", borderwidth=0)
+        self.topic_info.insert("1.0", "发送到 topic：\n订阅 topic：")
+        self.topic_info.configure(state="disabled")
+        self.topic_info.pack(anchor="w", pady=(0, 8))
         actions = ttk.Frame(bottom)
         actions.pack(fill="x")
         ttk.Button(actions, text="生成 JSON", command=self.generate).pack(side="left")
@@ -138,6 +149,7 @@ class WriteGatewayDialog(tk.Toplevel):
         result = {"t": "set", "d": {sn: payload}}
         self.output.delete("1.0", "end")
         self.output.insert("1.0", json.dumps(result, ensure_ascii=False, indent=2))
+        update_topic_info(self.topic_info, f"发送到 /s2/{sn} topic\n订阅 /d2/{sn} topic 看回复")
 
     def copy_json(self):
         text = self.output.get("1.0", "end").strip()
@@ -195,6 +207,10 @@ class ReadGatewayDialog(tk.Toplevel):
         ttk.Label(bottom, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(bottom, height=9, wrap="none")
         self.output.pack(fill="both", expand=True, pady=(4, 8))
+        self.topic_info = tk.Text(bottom, height=2, width=55, wrap="none", relief="flat", borderwidth=0)
+        self.topic_info.insert("1.0", "发送到 topic：\n订阅 topic：")
+        self.topic_info.configure(state="disabled")
+        self.topic_info.pack(anchor="w", pady=(0, 8))
         actions = ttk.Frame(bottom)
         actions.pack(fill="x")
         ttk.Button(actions, text="生成 JSON", command=self.generate).pack(side="left")
@@ -234,6 +250,7 @@ class ReadGatewayDialog(tk.Toplevel):
         result = {"t": "call", "d": {sn: {"ts": tags, "mid": int(mid)}}}
         self.output.delete("1.0", "end")
         self.output.insert("1.0", json.dumps(result, ensure_ascii=False, indent=2))
+        update_topic_info(self.topic_info, f"发送到 /s2/{sn} topic\n订阅 /d2/{sn} topic 看回复")
 
     def copy_json(self):
         text = self.output.get("1.0", "end").strip()
@@ -289,6 +306,10 @@ class ReadSlaveDialog(tk.Toplevel):
         ttk.Label(self.output_panel, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(self.output_panel, height=14, wrap="none")
         self.output.pack(fill="both", expand=True, pady=(4, 8))
+        self.topic_info = tk.Text(self.output_panel, height=2, width=55, wrap="none", relief="flat", borderwidth=0)
+        self.topic_info.insert("1.0", "发送到 topic：\n订阅 topic：")
+        self.topic_info.configure(state="disabled")
+        self.topic_info.pack(anchor="w", pady=(0, 8))
         ttk.Button(self.output_panel, text="生成 JSON", command=self.generate).pack(side="left")
         ttk.Button(self.output_panel, text="复制到剪贴板", command=self.copy_json).pack(side="left", padx=8)
 
@@ -316,6 +337,7 @@ class ReadSlaveDialog(tk.Toplevel):
         result = {"t": "call", "d": {dev_id: {"ts": tags, "mid": int(mid)}}}
         self.output.delete("1.0", "end")
         self.output.insert("1.0", json.dumps(result, ensure_ascii=False, indent=2))
+        update_topic_info(self.topic_info, f"发送到 /s/{self.dev_id.get().strip()} topic\n订阅 /d/{self.dev_id.get().strip()} topic 看回复")
 
     def copy_json(self):
         text = self.output.get("1.0", "end").strip()
@@ -355,6 +377,10 @@ class WriteSlaveDialog(tk.Toplevel):
         right = ttk.Frame(content, padding=10, width=430); right.pack(side="right", fill="both", expand=True); right.pack_propagate(False)
         ttk.Label(right, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(right, height=14, wrap="none"); self.output.pack(fill="both", expand=True, pady=(4, 8))
+        self.topic_info = tk.Text(right, height=2, width=55, wrap="none", relief="flat", borderwidth=0)
+        self.topic_info.insert("1.0", "发送到 topic：\n订阅 topic：")
+        self.topic_info.configure(state="disabled")
+        self.topic_info.pack(anchor="w", pady=(0, 8))
         ttk.Button(right, text="生成 JSON", command=self.generate).pack(side="left")
         ttk.Button(right, text="复制到剪贴板", command=self.copy_json).pack(side="left", padx=8)
 
@@ -390,6 +416,7 @@ class WriteSlaveDialog(tk.Toplevel):
         payload["mid"] = int(mid)
         result = {"t": "set", "d": {dev_id: payload}}
         self.output.delete("1.0", "end"); self.output.insert("1.0", json.dumps(result, ensure_ascii=False, indent=2))
+        update_topic_info(self.topic_info, f"发送到 /s/{dev_id} topic\n订阅 /d2/{dev_id} topic 看回复")
 
     def copy_json(self):
         text = self.output.get("1.0", "end").strip()
@@ -436,6 +463,10 @@ class OtaDialog(tk.Toplevel):
         ttk.Label(right, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(right, height=16, wrap="none")
         self.output.pack(fill="both", expand=True, pady=(4, 8))
+        self.topic_info = tk.Text(right, height=2, width=55, wrap="none", relief="flat", borderwidth=0)
+        self.topic_info.insert("1.0", "发送到 topic：\n订阅 topic：")
+        self.topic_info.configure(state="disabled")
+        self.topic_info.pack(anchor="w", pady=(0, 8))
         ttk.Button(right, text="生成 JSON", command=self.generate).pack(side="left")
         ttk.Button(right, text="复制到剪贴板", command=self.copy_json).pack(side="left", padx=8)
 
@@ -452,6 +483,7 @@ class OtaDialog(tk.Toplevel):
         }}}
         self.output.delete("1.0", "end")
         self.output.insert("1.0", json.dumps(result, ensure_ascii=False, indent=2))
+        update_topic_info(self.topic_info, f"发送到 /s2/{values['sn'].upper()} topic\n订阅 /d2/{values['sn'].upper()} topic 看回复")
 
     def copy_json(self):
         text = self.output.get("1.0", "end").strip()
