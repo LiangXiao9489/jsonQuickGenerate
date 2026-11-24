@@ -1,0 +1,16 @@
+# 协议原始文件及 extra 文件夹下的所有内容
+/extra/
+
+# Python 运行缓存
+__pycache__/
+*.py[cod]
+
+# 本地虚拟环境
+.venv/
+venv/
+env/
+
+# 常见本地编辑器文件
+.vscode/
+.idea/
+*.swp
