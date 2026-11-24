@@ -500,8 +500,23 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("MQTT JSON 快速生成器")
-        self.geometry("650x390")
-        ttk.Label(self, text="MQTT JSON 快速生成器", font=("Microsoft YaHei", 18)).pack(pady=(35, 10))
+        self.geometry("650x510")
+        self.configure(bg="#EAF4F8")
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except tk.TclError:
+            pass
+        style.configure("TFrame", background="#EAF4F8")
+        style.configure("TLabel", background="#EAF4F8", foreground="#29434E", font=("Microsoft YaHei", 10))
+        style.configure("Title.TLabel", background="#EAF4F8", foreground="#11698E", font=("Microsoft YaHei", 20, "bold"))
+        style.configure("TButton", background="#2A9D8F", foreground="white", padding=(12, 7), font=("Microsoft YaHei", 10))
+        style.map("TButton", background=[("active", "#21867A"), ("pressed", "#176B62")], foreground=[("disabled", "#B8C5C9")])
+        style.configure("TLabelframe", background="#F7FBFC", bordercolor="#9CCBD4")
+        style.configure("TLabelframe.Label", background="#F7FBFC", foreground="#11698E", font=("Microsoft YaHei", 10, "bold"))
+        style.configure("TEntry", fieldbackground="white")
+        style.configure("TCombobox", fieldbackground="white")
+        ttk.Label(self, text="MQTT JSON 快速生成器", style="Title.TLabel").pack(pady=(35, 10))
         ttk.Label(self, text="根据协议生成可直接复制到 MQTT 客户端的 JSON").pack(pady=5)
         ttk.Button(self, text="写网关参数", command=lambda: WriteGatewayDialog(self)).pack(pady=15, ipadx=25, ipady=8)
         ttk.Button(self, text="读网关参数", command=lambda: ReadGatewayDialog(self)).pack(pady=8, ipadx=25, ipady=8)
