@@ -1,0 +1,16 @@
+name,tag,type,range,reboot,EPM,EHV,default
+u1 波特率,u1_baudrate,number,1200~115200,是,是,,9600
+u1 数据位,u1_databits,number,5~8,是,是,,8
+u1 停止位,u1_stopbits,number,1~2,是,是,,2
+u1 校验位,u1_parity,string,N / E / O,是,是,,N
+u2 波特率,u2_baudrate,number,1200~115200,是,是,是,9600
+u2 数据位,u2_databits,number,5~8,是,是,是,8
+u2 停止位,u2_stopbits,number,1~2,是,是,是,2
+u2 校验位,u2_parity,string,N / E / O,是,是,是,N
+上报周期（分钟）,upload_interval_min,number,1~60,否,是,是,5
+变化检测周期（秒）,change_check_sec,number,1~60,否,是,是,5
+485 写穿透使能,write_through_en,bool,0 / 1,否,是,,true
+MQTT 远程 DO 使能,mqtt_do_en,bool,0 / 1,否,,是,true
+本地采样周期（毫秒）,local_sample_ms,number,100~10000,是,,是,500
+上报 real 使能,report_real_enable,bool,0 / 1,否,是,是,false
+上报 change 使能,report_change_enable,bool,0 / 1,否,是,是,false
