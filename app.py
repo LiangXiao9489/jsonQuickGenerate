@@ -398,6 +398,72 @@ class WriteSlaveDialog(tk.Toplevel):
             self.clipboard_clear(); self.clipboard_append(text); messagebox.showinfo("已复制", "JSON 已复制到剪贴板。", parent=self)
 
 
+class OtaDialog(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        self.title("OTA 升级网关")
+        self.geometry("1100x728")
+        self.resizable(True, True)
+        self.build()
+
+    def build(self):
+        content = ttk.Frame(self)
+        content.pack(fill="both", expand=True)
+        form = ttk.LabelFrame(content, text="OTA 参数", padding=16)
+        form.pack(side="left", fill="both", expand=True, padx=(10, 5), pady=10)
+        fields = (
+            ("网关 SN", "sn", "例如：03230619179356C9"),
+            ("固件 HTTP/HTTPS 地址", "url", "例如：http://example.com/firmware.bin"),
+            ("CRC32", "crc", "支持十进制或 0x 开头十六进制"),
+            ("固件大小（字节）", "size", "例如：524288"),
+            ("消息 ID mid", "mid", "整数，例如：501"),
+        )
+        self.entries = {}
+        for row, (label, key, hint) in enumerate(fields):
+            ttk.Label(form, text=label + ":").grid(row=row, column=0, padx=5, pady=10, sticky="w")
+            entry = ttk.Entry(form, width=58)
+            entry.grid(row=row, column=1, padx=8, pady=10, sticky="ew")
+            ttk.Label(form, text=hint).grid(row=row, column=2, padx=5, pady=10, sticky="w")
+            self.entries[key] = entry
+        self.entries["mid"].insert(0, "501")
+        form.columnconfigure(1, weight=1)
+        ttk.Label(form, text="说明：OTA 成功后网关会自动重启；升级中重复发送可能返回 busy。", foreground="#666666").grid(
+            row=len(fields), column=0, columnspan=3, padx=5, pady=(20, 5), sticky="w")
+
+        right = ttk.Frame(content, padding=10, width=470)
+        right.pack(side="right", fill="both", expand=True)
+        right.pack_propagate(False)
+        ttk.Label(right, text="生成 JSON:").pack(anchor="w")
+        self.output = tk.Text(right, height=16, wrap="none")
+        self.output.pack(fill="both", expand=True, pady=(4, 8))
+        ttk.Button(right, text="生成 JSON", command=self.generate).pack(side="left")
+        ttk.Button(right, text="复制到剪贴板", command=self.copy_json).pack(side="left", padx=8)
+
+    def generate(self):
+        values = {key: entry.get().strip() for key, entry in self.entries.items()}
+        if not values["sn"] or not values["url"] or not values["crc"] or not values["size"]:
+            messagebox.showwarning("参数不完整", "SN、URL、CRC 和固件大小不能为空。", parent=self)
+            return
+        if not values["mid"].isdigit() or not values["size"].isdigit():
+            messagebox.showwarning("格式提示", "mid 和固件大小建议填写整数。", parent=self)
+            return
+        result = {"t": "ota", "d": {values["sn"].upper(): {
+            "url": values["url"], "crc": values["crc"], "size": values["size"], "mid": int(values["mid"])
+        }}}
+        self.output.delete("1.0", "end")
+        self.output.insert("1.0", json.dumps(result, ensure_ascii=False, indent=2))
+
+    def copy_json(self):
+        text = self.output.get("1.0", "end").strip()
+        if not text:
+            self.generate()
+            text = self.output.get("1.0", "end").strip()
+        if text:
+            self.clipboard_clear()
+            self.clipboard_append(text)
+            messagebox.showinfo("已复制", "JSON 已复制到剪贴板。", parent=self)
+
+
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -409,6 +475,7 @@ class App(tk.Tk):
         ttk.Button(self, text="读网关参数", command=lambda: ReadGatewayDialog(self)).pack(pady=8, ipadx=25, ipady=8)
         ttk.Button(self, text="读设备参数", command=lambda: ReadSlaveDialog(self)).pack(pady=8, ipadx=25, ipady=8)
         ttk.Button(self, text="写设备参数", command=lambda: WriteSlaveDialog(self)).pack(pady=8, ipadx=25, ipady=8)
+        ttk.Button(self, text="OTA 升级网关", command=lambda: OtaDialog(self)).pack(pady=8, ipadx=25, ipady=8)
 
 
 if __name__ == "__main__":
