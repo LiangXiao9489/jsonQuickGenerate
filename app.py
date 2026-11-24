@@ -29,7 +29,7 @@ class WriteGatewayDialog(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
         self.title("写网关参数")
-        self.geometry("1066x728")
+        self.geometry("1350x728")
         self.resizable(True, True)
         self.rows = []
         self.param_defs = load_params()
@@ -52,13 +52,16 @@ class WriteGatewayDialog(tk.Toplevel):
         ttk.Button(bar, text="＋ 添加字段", command=self.add_row).pack(side="left")
         ttk.Label(bar, text="提示仅用于提醒，超出范围仍允许生成").pack(side="left", padx=12)
 
-        self.table = ttk.Frame(self, padding=10)
-        self.table.pack(fill="both", expand=True)
+        content = ttk.Frame(self)
+        content.pack(fill="both", expand=True)
+        self.table = ttk.Frame(content, padding=10)
+        self.table.pack(side="left", fill="both", expand=True)
         self.draw_header()
         self.add_row()
 
-        bottom = ttk.Frame(self, padding=10)
-        bottom.pack(fill="both")
+        bottom = ttk.Frame(content, padding=10, width=430)
+        bottom.pack(side="right", fill="both", expand=True)
+        bottom.pack_propagate(False)
         ttk.Label(bottom, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(bottom, height=8, wrap="none")
         self.output.pack(fill="both", expand=True, pady=(4, 8))
@@ -82,10 +85,10 @@ class WriteGatewayDialog(tk.Toplevel):
         row_no = len(self.rows) + 1
         tag_var = tk.StringVar()
         value_var = tk.StringVar()
-        combo = ttk.Combobox(self.table, textvariable=tag_var, width=25, state="readonly")
+        combo = ttk.Combobox(self.table, textvariable=tag_var, width=50, state="readonly")
         combo["values"] = [f"{x['name']} ({x['tag']})" for x in self.param_defs]
         combo.grid(row=row_no, column=0, padx=4, pady=4, sticky="ew")
-        value = ttk.Entry(self.table, textvariable=value_var, width=25)
+        value = ttk.Entry(self.table, textvariable=value_var, width=12)
         value.grid(row=row_no, column=1, padx=4, pady=4, sticky="ew")
         hint = ttk.Label(self.table, text="请选择参数")
         hint.grid(row=row_no, column=2, padx=4, pady=4, sticky="w")
@@ -167,8 +170,10 @@ class ReadGatewayDialog(tk.Toplevel):
         self.mid.grid(row=0, column=3, padx=6, sticky="w")
         ttk.Button(top, text="重新读取参数表", command=self.reload_params).grid(row=0, column=4, padx=8)
 
-        select = ttk.LabelFrame(self, text="读取范围", padding=12)
-        select.pack(fill="both", expand=True, padx=10, pady=(0, 8))
+        content = ttk.Frame(self)
+        content.pack(fill="both", expand=True)
+        select = ttk.LabelFrame(content, text="读取范围", padding=12)
+        select.pack(side="left", fill="both", expand=True, padx=(10, 5), pady=(0, 8))
         self.all_params = tk.BooleanVar(value=True)
         ttk.Checkbutton(select, text="读取全部网关参数（包含状态和只读字段）",
                         variable=self.all_params, command=self.toggle_list).pack(anchor="w")
@@ -183,8 +188,9 @@ class ReadGatewayDialog(tk.Toplevel):
         scroll.pack(side="right", fill="y")
         self.reload_params(False)
 
-        bottom = ttk.Frame(self, padding=10)
-        bottom.pack(fill="both", expand=True)
+        bottom = ttk.Frame(content, padding=10, width=430)
+        bottom.pack(side="right", fill="both", expand=True)
+        bottom.pack_propagate(False)
         ttk.Label(bottom, text="生成 JSON:").pack(anchor="w")
         self.output = tk.Text(bottom, height=9, wrap="none")
         self.output.pack(fill="both", expand=True, pady=(4, 8))
